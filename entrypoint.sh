@@ -8,5 +8,9 @@ if ! command -v google-chrome; then
 fi
 google-chrome --version
 
+# Debug: Check network connectivity
+echo "Checking network connectivity..."
+curl -I https://dl.google.com || echo "Warning: Failed to reach dl.google.com"
+
 # Run the app
 exec python app.py
