@@ -30,40 +30,51 @@ if st.button("Find Links"):
             elif system == "Darwin":
                 chrome_path = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
             elif system == "Linux":
-                # Try multiple possible Chrome paths for Linux environments
+                # Prioritize Chromium, then Chrome
                 possible_paths = [
-                    "/usr/bin/google-chrome",
+                    "/usr/bin/chromium",  # Common path for Chromium
+                    "/usr/lib/chromium-browser/chromium",
+                    "/usr/bin/chromium-browser",
+                    "/usr/bin/google-chrome",  # Common path for Chrome
                     "/usr/bin/google-chrome-stable",
                     "/opt/google/chrome/chrome",
                     "/usr/local/bin/google-chrome",
                     "/usr/lib/chromium-browser/chrome",
-                    "/bin/google-chrome"
+                    "/bin/google-chrome",
+                    "/bin/chromium"
                 ]
                 chrome_path = None
-                st.write("Attempting to find Chrome executable in the following paths:")
+                st.write("Attempting to find browser executable in the following paths:")
                 for path in possible_paths:
                     st.write(f"Checking: {path}")
                     if os.path.exists(path):
                         chrome_path = path
                         break
                 if not chrome_path:
-                    # Try to find Chrome dynamically if none of the paths work
-                    import subprocess
+                    # Try to find the browser dynamically
                     try:
-                        chrome_path = subprocess.check_output(["which", "google-chrome"]).decode().strip()
-                        st.write(f"Found Chrome via 'which': {chrome_path}")
+                        chrome_path = subprocess.check_output(["which", "chromium"]).decode().strip()
+                        st.write(f"Found Chromium via 'which': {chrome_path}")
                     except:
-                        raise FileNotFoundError("Chrome executable not found in any of the expected paths: " + ", ".join(possible_paths) + ". Ensure Chrome is installed in the Docker container.")
+                        try:
+                            chrome_path = subprocess.check_output(["which", "google-chrome"]).decode().strip()
+                            st.write(f"Found Chrome via 'which': {chrome_path}")
+                        except:
+                            raise FileNotFoundError(
+                                "Neither Chromium nor Chrome executable found in any of the expected paths: " +
+                                ", ".join(possible_paths) +
+                                ". Ensure a browser is installed in the Docker container. Check Render build logs for installation details."
+                            )
             else:
                 raise Exception("Unsupported operating system")
 
-            # Log the Chrome path being used
-            st.write(f"Using Chrome at: {chrome_path}")
+            # Log the browser path being used
+            st.write(f"Using browser at: {chrome_path}")
 
             # Temporary directory for clean profile
             temp_profile_dir = tempfile.mkdtemp()
 
-            # Chrome command with headless mode
+            # Browser command with headless mode
             chrome_command = [
                 chrome_path,
                 "--headless=new",
@@ -80,7 +91,7 @@ if st.button("Find Links"):
             # if proxy:
             #     chrome_command.append(f"--proxy-server={proxy}")
 
-            # Launch Chrome
+            # Launch the browser
             chrome_process = subprocess.Popen(chrome_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
             # Fetch and search page with Playwright
@@ -123,7 +134,7 @@ if st.button("Find Links"):
             st.error(f"Error: {e}")
 
         finally:
-            # Terminate Chrome process
+            # Terminate browser process
             if 'chrome_process' in locals():
                 chrome_process.terminate()
                 time.sleep(1)
@@ -132,4 +143,4 @@ if st.button("Find Links"):
             # Clean up temporary profile
             if 'temp_profile_dir' in locals() and os.path.exists(temp_profile_dir):
                 shutil.rmtree(temp_profile_dir)
-            st.write("Chrome closed.")
+            st.write("Browser closed.")
