@@ -3,10 +3,8 @@ FROM python:3.9-slim
 # Set working directory
 WORKDIR /app
 
-# Install minimal dependencies for Chrome
+# Install minimal dependencies for Playwright's Chromium
 RUN apt-get update && apt-get install -y \
-    wget \
-    gnupg \
     libnss3 \
     libgbm1 \
     fonts-liberation \
@@ -21,15 +19,12 @@ RUN apt-get update && apt-get install -y \
     libdrm2 \
     && rm -rf /var/lib/apt/lists/*
 
-# Add Chrome's official APT repository and install Chrome
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
-    && apt-get update \
-    && apt-get install -y google-chrome-stable
-
 # Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Install Playwright's bundled Chromium
+RUN playwright install chromium
 
 # Copy application files
 COPY . .
