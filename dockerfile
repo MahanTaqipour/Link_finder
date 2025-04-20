@@ -3,7 +3,7 @@ FROM python:3.9-slim
 # Set working directory
 WORKDIR /app
 
-# Install minimal dependencies for Playwright's Chromium
+# Install dependencies for Playwright's Chromium
 RUN apt-get update && apt-get install -y \
     libnss3 \
     libgbm1 \
@@ -17,6 +17,11 @@ RUN apt-get update && apt-get install -y \
     libatk-bridge2.0-0 \
     libcups2 \
     libdrm2 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    libxkbcommon0 \
+    libasound2 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
