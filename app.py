@@ -31,6 +31,8 @@ def main():
             page.wait_for_timeout(10000)
             html_content = page.content()
             print("Page loaded.")
+            print("HTML content:")
+            print(html_content)
             browser.close()
 
         # Search for links in <iframe data-src>
