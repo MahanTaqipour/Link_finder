@@ -34,15 +34,26 @@ if st.button("Find Links"):
                 possible_paths = [
                     "/usr/bin/google-chrome",
                     "/usr/bin/google-chrome-stable",
-                    "/opt/google/chrome/chrome"
+                    "/opt/google/chrome/chrome",
+                    "/usr/local/bin/google-chrome",
+                    "/usr/lib/chromium-browser/chrome",
+                    "/bin/google-chrome"
                 ]
                 chrome_path = None
+                st.write("Attempting to find Chrome executable in the following paths:")
                 for path in possible_paths:
+                    st.write(f"Checking: {path}")
                     if os.path.exists(path):
                         chrome_path = path
                         break
                 if not chrome_path:
-                    raise FileNotFoundError("Chrome executable not found in any of the expected paths: " + ", ".join(possible_paths))
+                    # Try to find Chrome dynamically if none of the paths work
+                    import subprocess
+                    try:
+                        chrome_path = subprocess.check_output(["which", "google-chrome"]).decode().strip()
+                        st.write(f"Found Chrome via 'which': {chrome_path}")
+                    except:
+                        raise FileNotFoundError("Chrome executable not found in any of the expected paths: " + ", ".join(possible_paths) + ". Ensure Chrome is installed in the Docker container.")
             else:
                 raise Exception("Unsupported operating system")
 
