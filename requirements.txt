@@ -1,4 +1,4 @@
-streamlit
+# streamlit
 playwright
 playwright-stealth
 beautifulsoup4
