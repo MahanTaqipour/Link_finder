@@ -30,14 +30,14 @@ def main():
         print(f"\nProcessing {site_url}...")
         logging.info(f"Processing {site_url}")
         try:
-            # Fetch and search page with Playwright using Google Chrome
-            print("Launching Playwright browser with Google Chrome...")
-            logging.info("Launching Playwright browser with Google Chrome")
+            # Fetch and search page with Playwright using Chrome
+            print("Launching Playwright browser with Chrome...")
+            logging.info("Launching Playwright browser with Chrome")
             with sync_playwright() as p:
                 browser = p.chromium.launch(
                     headless=True,
                     args=["--no-sandbox", "--disable-dev-shm-usage"],
-                    executable_path="/usr/bin/google-chrome"  # Path to Google Chrome
+                    executable_path="chrome"  # Path for zenika/alpine-chrome
                 )
                 page = browser.new_page()
                 stealth_sync(page)
