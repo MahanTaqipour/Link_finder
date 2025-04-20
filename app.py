@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 
 # Streamlit UI
 st.title("Dailymotion Link Finder")
-st.markdown("Enter a `seatv-24.xyz` URL to find Dailymotion links in `<iframe data-src>`.")
+st.markdown("Enter a `seatv-24.xyz` URL to find Dailymotion links")
 
 # Input field for URL
 site_url = st.text_input("Enter the seatv-24.xyz website URL:", placeholder="https://seatv-24.xyz/...")
@@ -30,13 +30,24 @@ if st.button("Find Links"):
             elif system == "Darwin":
                 chrome_path = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
             elif system == "Linux":
-                chrome_path = "/usr/bin/google-chrome"  # For Render's Linux environment
+                # Try multiple possible Chrome paths for Linux environments
+                possible_paths = [
+                    "/usr/bin/google-chrome",
+                    "/usr/bin/google-chrome-stable",
+                    "/opt/google/chrome/chrome"
+                ]
+                chrome_path = None
+                for path in possible_paths:
+                    if os.path.exists(path):
+                        chrome_path = path
+                        break
+                if not chrome_path:
+                    raise FileNotFoundError("Chrome executable not found in any of the expected paths: " + ", ".join(possible_paths))
             else:
                 raise Exception("Unsupported operating system")
 
-            # Verify Chrome executable
-            if not os.path.exists(chrome_path):
-                raise FileNotFoundError(f"Chrome executable not found at {chrome_path}")
+            # Log the Chrome path being used
+            st.write(f"Using Chrome at: {chrome_path}")
 
             # Temporary directory for clean profile
             temp_profile_dir = tempfile.mkdtemp()
@@ -54,8 +65,9 @@ if st.button("Find Links"):
             ]
 
             # Optional proxy to avoid CAPTCHA
-            # proxy = "http://user:pass@residential-proxy:port"
-            # chrome_command.append(f"--proxy-server={proxy}")
+            # proxy = os.getenv("PROXY_SERVER")
+            # if proxy:
+            #     chrome_command.append(f"--proxy-server={proxy}")
 
             # Launch Chrome
             chrome_process = subprocess.Popen(chrome_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
