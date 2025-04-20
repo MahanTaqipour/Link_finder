@@ -11,12 +11,13 @@ def main():
     print(f"Using URL: {site_url}")
 
     try:
-        # Fetch and search page with Playwright
-        print("Launching Playwright browser and loading page...")
+        # Fetch and search page with Playwright using system Chrome
+        print("Launching Playwright browser with system Chrome...")
         with sync_playwright() as p:
             browser = p.chromium.launch(
                 headless=True,
-                args=["--no-sandbox", "--disable-dev-shm-usage"]
+                args=["--no-sandbox", "--disable-dev-shm-usage"],
+                executable_path="/usr/bin/google-chrome"  # Use system Chrome
             )
             page = browser.new_page()
             stealth_sync(page)
